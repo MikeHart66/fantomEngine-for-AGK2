@@ -1,14 +1,3 @@
-//******************************
-//
-// fantomEngine for AppGameKit 2
-//
-// Author: Michael Hartlef
-//
-// License: MIT
-//
-//******************************
-
-
 #option_explicit
 
 #constant True = 1
@@ -44,7 +33,6 @@ global ftfreeObjList as integer[]
 #constant KEY_6         =  54
 #constant KEY_7          = 55
 #constant KEY_8          = 56
-
 #constant KEY_9          = 57
 #constant KEY_A          = 65
 #constant KEY_B          = 66
@@ -61,7 +49,6 @@ global ftfreeObjList as integer[]
 #constant KEY_M          = 77
 #constant KEY_N          = 78
 #constant KEY_O          = 79
-
 #constant KEY_P          = 80
 #constant KEY_Q          = 81
 #constant KEY_R          = 82
@@ -79,9 +66,12 @@ global ftfreeObjList as integer[]
 #constant kEY_F4         = 115
 #constant KEY_F5         = 116
 #constant KEY_F6         = 117
-
 #constant KEY_F7         = 118
 #constant KEY_F8         = 119
+#constant KEY_F9         = 120
+#constant KEY_F10        = 121
+#constant KEY_F11        = 122
+#constant KEY_F12        = 123
 
 #constant ctCircle = 1
 #constant ctBox = 2
@@ -92,6 +82,7 @@ type ftObject
 	deleted as integer
 	spr as integer
 	id as integer
+	layer as integer
 	
 	speed as float
 	speedX as float
@@ -130,8 +121,11 @@ function CreateObject(img as integer)
 		//ftfreeObjList.remove()
 		ftfreeObjList.remove(0)
 		ftObjList[retval].deleted = false
-		ftObjList[retval].spr = CreateSprite(img)
-		SetSpriteScale(ftObjList[retval].spr, 1.0, 1.0)
+		if img > 0	
+			ftObjList[retval].spr = CreateSprite(img)
+			//SetSpriteScale(ftObjList[retval].spr, 1.0, 1.0)
+		endif
+		
 		ftObjList[retval].id = 0
 		ftObjList[retval].speed = 0.0
 		ftObjList[retval].speedX = 0.0
@@ -152,9 +146,12 @@ function CreateObject(img as integer)
 		ftObjList[retval].parent = -1
 		ftObjList[retval].childList.length = -1
 		ftObjList[retval].doTouchCheck = 0
+		ftObjList[retval].layer = 0
 	else
-		newObj.spr = CreateSprite(img)
-		SetSpriteScale(newObj.spr, 1.0, 1.0)
+		if img > 0
+			newObj.spr = CreateSprite(img)
+			//SetSpriteScale(newObj.spr, 1.0, 1.0)
+		endif
 		newObj.speedMax = 100.0
 		newObj.parent = -1
 		newObj.timer01 = -0.01
@@ -213,8 +210,10 @@ function CheckAllCollisions()
 					for colGrp = 0 to cgl 
 						for ind2 = 0 to oc
 							if ftObjList[ind2].colGroup = ftObjList[ind1].colWith[colGrp]
-								if GetSpriteCollision ( ftObjList[ind1].spr, ftObjList[ind2].spr ) = 1
-									OnObjCollision(ind1,ind2)
+								if ftObjList[ind1].spr <> -1 and ftObjList[ind2].spr <> -1
+									if GetSpriteCollision ( ftObjList[ind1].spr, ftObjList[ind2].spr ) = 1
+										OnObjCollision(ind1,ind2)
+									endif
 								endif
 							endif
 						next
@@ -301,6 +300,12 @@ endfunction retVal
 function GetID(obj as integer)
 	local retVal as integer
 	retVal = ftObjList[obj].ID
+endfunction retVal
+
+//-----------------------------------------------------
+function GetLayer(obj as integer)
+	local retVal as integer
+	retVal = ftObjList[obj].layer
 endfunction retVal
 
 //-----------------------------------------------------
@@ -402,7 +407,7 @@ function RemoveObject(obj as integer)
 endfunction
 
 //-----------------------------------------------------
-function SetActive(obj as integer, flag)
+function SetActive(obj as integer, flag as integer)
 	SetSpriteActive(ftObjList[obj].spr,flag)
 endfunction
 
@@ -427,13 +432,44 @@ function SetFriction(obj as integer, fric#)
 endfunction
 
 //-----------------------------------------------------
+function SetLayer(obj as integer, lay as integer)
+	ftObjList[obj].layer = lay
+endfunction
+
+//-----------------------------------------------------
+function SetLayerActive(lay as integer, flag as integer)
+	local oc as integer
+	local ind as integer
+	oc = ftObjList.length
+	for ind = 0 to oc
+		if ftObjList[ind].layer = lay
+			SetActive(ind, flag)
+		endif
+	next
+ 
+endfunction
+	
+//-----------------------------------------------------
+function SetLayerVisible(lay as integer, flag as integer)
+	local oc as integer
+	local ind as integer
+	oc = ftObjList.length
+	for ind = 0 to oc
+		if ftObjList[ind].layer = lay 
+			SetVisible(ind, flag)
+		endif
+	next
+ 
+endfunction
+	
+//-----------------------------------------------------
 function SetHandle(obj as integer, x#, y#)
 	SetSpriteOffset( ftObjList[obj].spr, GetSpriteWidth(ftObjList[obj].spr)*x#, GetSpriteHeight(ftObjList[obj].spr)*y# ) 
 endfunction
 	
 //-----------------------------------------------------
 function SetID(obj as integer, id as integer)
-	ftObjList[obj].ID = id
+	ftObjList[obj].id = id
 endfunction
 	
 //-----------------------------------------------------
