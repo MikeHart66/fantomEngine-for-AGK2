@@ -269,7 +269,11 @@ endfunction
 //-----------------------------------------------------
 function GetActive(obj as integer)
 	local retVal as integer
-	retVal = GetSpriteActive(ftObjList[obj].spr)
+	if ftObjList[obj].spr > 0
+		retVal = GetSpriteActive(ftObjList[obj].spr)
+	else
+		retVal = False
+	endif
 endfunction retVal
 
 //-----------------------------------------------------
@@ -345,6 +349,30 @@ function GetSprite(obj as integer)
 endfunction retVal
 
 //-----------------------------------------------------
+function GetTargetAngle(obj as integer, target as integer, relative as integer)
+	Local xdiff as Float
+	Local ydiff as Float 
+	Local ang as Float
+		
+	xdiff = GetPosX(target) - GetPosX(obj)
+	ydiff = GetPosY(target) - GetPosY(obj)
+		
+	ang = ATan2( ydiff, xdiff )+90.0
+	If ang < 0 
+		ang = 360.0 + ang
+	Endif
+	If relative=True
+		ang = ang - GetAngle(obj)
+		If ang > 180.0
+			ang = ang - 360.0
+		Elseif ang < -180.0
+			ang = ang + 360.0
+		Endif
+	Endif
+endfunction ang
+
+
+//-----------------------------------------------------
 function GetTween(obj as integer)
 	local retVal as integer
 	retVal = ftObjList[obj].tweenID
@@ -408,7 +436,7 @@ endfunction
 
 //-----------------------------------------------------
 function SetActive(obj as integer, flag as integer)
-	SetSpriteActive(ftObjList[obj].spr,flag)
+	if ftObjList[obj].spr > 0 then SetSpriteActive(ftObjList[obj].spr,flag)
 endfunction
 
 //-----------------------------------------------------
