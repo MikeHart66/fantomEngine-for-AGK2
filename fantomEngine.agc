@@ -96,7 +96,7 @@ type ftObject
 	isWrappingX as integer
 	isWrappingY as integer
 	
-	timer01 as float
+	timerList as ftTimer[]
 	
 	colGroup as integer
 	doCollision as integer
@@ -108,6 +108,12 @@ type ftObject
 	parent as integer
 	childList as integer[]
 
+endtype
+
+//-----------------------------------------------------
+type ftTimer
+	durance as float
+	id as integer
 endtype
 
 //-----------------------------------------------------
@@ -137,7 +143,7 @@ function CreateObject(img as integer)
 		ftObjList[retval].speedMin= 0.0
 		ftObjList[retval].isWrappingX = false
 		ftObjList[retval].isWrappingY = false
-		ftObjList[retval].timer01 = -0.01
+		ftObjList[retval].timerList.length = -1
 		ftObjList[retval].colGroup = 0
 		ftObjList[retval].tweenID = 0
 		ftObjList[retval].tweenSpr = 0
@@ -154,13 +160,20 @@ function CreateObject(img as integer)
 		endif
 		newObj.speedMax = 100.0
 		newObj.parent = -1
-		newObj.timer01 = -0.01
+		//newObj.timer01 = -0.01
 		ftObjList.insert(newObj)
 		retval = ftObjList.length
 		//log ("New="+str(retval))
 	endif
 endfunction retval
 
+//-----------------------------------------------------
+function CreateTimer(obj as integer, id as integer, durance as float)
+	local newTimer as ftTimer
+	newTimer.durance = durance
+	newTimer.id = id
+	ftObjList[obj].timerList.insert(newTimer)
+endfunction
 //-----------------------------------------------------
 function AddAngle(obj as integer, angle#)
 	//SetSpriteAngle(obj.spr, angle#+GetSpriteAngle(obj.spr))
@@ -594,11 +607,6 @@ function SetSpin(obj as integer, spin#)
 endfunction
 
 //-----------------------------------------------------
-function SetTimer(obj as integer, timeFrame#)
-	ftObjList[obj].timer01 = timeFrame#
-endfunction
-
-//-----------------------------------------------------
 function SetTouchCheck(obj as integer, touchFlag as integer)
 	ftObjList[obj].doTouchCheck = touchFlag
 endfunction
@@ -642,12 +650,18 @@ function UpdateObject(obj as integer, delta as float)
 	Local currSpeed as Float
 	Local currFriction as Float
 	Local absSpeedSpin as Float
+	local tc as integer
+	local ind as integer
 	
-	if ftObjList[obj].timer01 > 0.0  
-		dec ftObjList[obj].timer01, delta
-		//Print (ftObjList[obj].timer01)
-		if ftObjList[obj].timer01 < 0.0 then OnObjTimer(obj)
-	endif
+	tc = ftObjList[obj].timerList.length
+	
+	for ind = tc to 0 step -1
+		dec ftObjList[obj].timerList[ind].durance, delta
+		if ftObjList[obj].timerList[ind].durance <= 0
+			OnObjTimer(obj, ftObjList[obj].timerList[ind].id)
+			ftObjList[obj].timerList.remove(ind)
+		endif
+	next
 	
 	OnObjUpdate(obj)
 	if ftObjList[obj].deleted = true then exitfunction
