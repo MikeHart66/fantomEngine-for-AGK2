@@ -175,34 +175,55 @@ function CreateTimer(obj as integer, id as integer, durance as float)
 	ftObjList[obj].timerList.insert(newTimer)
 endfunction
 //-----------------------------------------------------
-function AddAngle(obj as integer, angle#)
-	//SetSpriteAngle(obj.spr, angle#+GetSpriteAngle(obj.spr))
-	SetAngle(obj, angle#+GetAngle(obj))
+function AddAngle(obj as integer, angle as float)
+	SetAngle(obj, angle + GetAngle(obj))
 endfunction
 	
 //-----------------------------------------------------
-function AddPos(obj as integer, xPos#, yPos#)
+function AddPos(obj as integer, xPos as float, yPos as float)
 	local ch as integer
 	local chl as integer
+	local xp2 as float
+	local yp2 as float
 	chl = ftObjList[obj].childList.length
 	if chl >= 0
 		for ch = 0 to chl
-			AddPos(ftObjList[obj].childList[ch], xPos#, yPos#)
+			AddPos(ftObjList[obj].childList[ch], xPos, yPos)
 		next
 	endif
-	xPos# = xPos# + GetPosX(obj)
-	yPos# = yPos# + GetPosY(obj)
-	SetPos(obj,xpos#,ypos#)
+	xp2 = xPos + GetPosX(obj)
+	yp2 = yPos + GetPosY(obj)
+	SetPos(obj,xp2,yp2)
 endfunction
+
 //-----------------------------------------------------
-function AddPosX(obj as integer, xPos#)
-	xPos# = xPos# + GetPosX(obj)
-	SetPosX(obj,xpos#)
+function AddPosX(obj as integer, xPos as float)
+	local ch as integer
+	local chl as integer
+	local xp2 as float
+	chl = ftObjList[obj].childList.length
+	if chl >= 0
+		for ch = 0 to chl
+			AddPosX(ftObjList[obj].childList[ch], xPos)
+		next
+	endif
+	xp2 = xPos + GetPosX(obj)
+	SetPosX(obj,xp2)
 endfunction
+
 //-----------------------------------------------------
-function AddPosY(obj as integer, yPos#)
-	yPos# = yPos# + GetPosY(obj)
-	SetPosY(obj,ypos#)
+function AddPosY(obj as integer, yPos as float)
+	local ch as integer
+	local chl as integer
+	local yp2 as float
+	chl = ftObjList[obj].childList.length
+	if chl >= 0
+		for ch = 0 to chl
+			AddPosY(ftObjList[obj].childList[ch], yPos)
+		next
+	endif
+	yp2 = yPos + GetPosY(obj)
+	SetPosY(obj,yp2)
 endfunction
 
 //-----------------------------------------------------
